@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import IBlog from '../types/blog';
+import { IBlog } from '../types/blog';
 
 const blogSchema = new mongoose.Schema<IBlog>({
   title: String,
