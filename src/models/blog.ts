@@ -1,11 +1,5 @@
 import mongoose from 'mongoose';
-
-interface IBlog {
-  title: string,
-  author: string,
-  url: string,
-  likes: number
-}
+import IBlog from '../types/blog';
 
 const blogSchema = new mongoose.Schema<IBlog>({
   title: String,
