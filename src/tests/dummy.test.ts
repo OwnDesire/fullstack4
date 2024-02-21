@@ -34,21 +34,21 @@ const listWithManyBlogs = [
   },
   {
     title: 'Title3',
-    author: 'Author3',
+    author: 'Author1',
     url: 'https://page3.com',
     likes: 112,
     id: '65d5c51061548c0858dc0b11'
   },
   {
     title: 'Title4',
-    author: 'Author4',
+    author: 'Author1',
     url: 'https://page4.com',
     likes: 14,
     id: '65d5c50d1747f4092543782b'
   },
   {
     title: 'Title5',
-    author: 'Author5',
+    author: 'Author2',
     url: 'https://page5.com',
     likes: 84,
     id: '65d5c509ba98ef054d2b7b12'
@@ -85,6 +85,40 @@ describe('favourite blog', () => {
 
   test('of list with many blogs is the one with the maximum amount of likes', () => {
     const result = listHelper.favouriteBlog(listWithManyBlogs);
-    assert.deepStrictEqual(result, {title: 'Title3', author: 'Author3', likes: 112});
+    assert.deepStrictEqual(result, {title: 'Title3', author: 'Author1', likes: 112});
+  });
+});
+
+describe('author with most blogs', () => {
+  test('of empty list of blogs is null', () => {
+    const result = listHelper.mostBlogs([]);
+    assert.strictEqual(result, null);
+  });
+
+  test('of list with single blog is the author of this blog', () => {
+    const result = listHelper.mostBlogs(listWithSingleBlog);
+    assert.deepStrictEqual(result, {author: 'Author1', blogs: 1});
+  });
+
+  test('of list with many blogs is the one with maximum anount of blogs', () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs);
+    assert.deepStrictEqual(result, {author: 'Author1', blogs: 3});
+  });
+});
+
+describe('author with most likes', () => {
+  test('of empty list of blogs is null', () => {
+    const result = listHelper.mostLikes([]);
+    assert.strictEqual(result, null);
+  });
+
+  test('of list with single blog is the author of this blog', () => {
+    const result = listHelper.mostLikes(listWithSingleBlog);
+    assert.deepStrictEqual(result, {author: 'Author1', likes: 8});
+  });
+
+  test('of list with many blogs is the one with maximum sum of likes on blogs', () => {
+    const result = listHelper.mostLikes(listWithManyBlogs);
+    assert.deepStrictEqual(result, {author: 'Author1', likes: 134});
   });
 });
