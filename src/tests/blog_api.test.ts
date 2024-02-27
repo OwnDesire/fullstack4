@@ -4,7 +4,6 @@ import supertest from 'supertest';
 import mongoose from 'mongoose';
 import app from '../app';
 import Blog from '../models/blog';
-import { IBlog, IBlogComplete } from '../types/blog';
 import helper from './blog_test_helper';
 
 const api = supertest(app);
@@ -36,8 +35,8 @@ test('blogs have the property named "id" as a unique identifier', async () => {
   assert('id' in blog);
 });
 
-test.only('a valid blog can be added to the database', async () => {
-  const newBlog: IBlog = {
+test('a valid blog can be added to the database', async () => {
+  const newBlog = {
     title: 'Title 3',
     author: 'Author3',
     url: 'https://address3.com',
@@ -55,6 +54,22 @@ test.only('a valid blog can be added to the database', async () => {
 
   const titles = blogsAtEnd.map(blog => blog.title);
   assert(titles.includes(newBlog.title));
+});
+
+test.only('"likes" property replaced with 0 if it was missing in request', async () => {
+  const newBlog = {
+    title: 'Title 4',
+    author: 'Author4',
+    url: 'https://address4.com'
+  };
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/);
+
+  assert.strictEqual(response.body.likes, 0);
 });
 
 after(async () => {
