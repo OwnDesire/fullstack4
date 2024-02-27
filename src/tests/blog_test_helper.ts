@@ -1,6 +1,7 @@
 import Blog from "../models/blog";
+import { IBlog } from '../types/blog';
 
-const initialBlogs = [
+const initialBlogs: IBlog[] = [
   {
     title: 'Title 1',
     author: 'Author1',
