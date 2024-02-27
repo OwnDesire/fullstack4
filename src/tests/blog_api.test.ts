@@ -17,16 +17,22 @@ beforeEach(async () => {
   }
 });
 
-test.only('blogs are returned as json', async () => {
+test('blogs are returned as json', async () => {
   await api
     .get('/api/blogs')
     .expect(200)
     .expect('Content-Type', /application\/json/);
 });
 
-test.only('there is a correct number of blogs', async () => {
+test('there is a correct number of blogs', async () => {
   const response = await api.get('/api/blogs');
   assert.strictEqual(response.body.length, helper.initialBlogs.length);
+});
+
+test.only('blogs have the property named "id" as a unique identifier', async () => {
+  const response = await api.get('/api/blogs');
+  const blog = response.body[0];
+  assert('id' in blog);
 });
 
 after(async () => {

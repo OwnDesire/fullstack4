@@ -1,3 +1,5 @@
+import Blog from "../models/blog";
+
 const initialBlogs = [
   {
     title: 'Title 1',
@@ -13,4 +15,9 @@ const initialBlogs = [
   }
 ];
 
-export default { initialBlogs };
+const blogsInDB = async () => {
+  const blogs = await Blog.find({});
+  return blogs.map(blog => blog.toJSON());
+}
+
+export default { initialBlogs, blogsInDB };
