@@ -1,5 +1,5 @@
 import Blog from "../models/blog";
-import { IBlog } from '../types/blog';
+import { IBlog, IBlogComplete } from '../types/blog';
 
 const initialBlogs: IBlog[] = [
   {
@@ -18,7 +18,7 @@ const initialBlogs: IBlog[] = [
 
 const blogsInDB = async () => {
   const blogs = await Blog.find({});
-  return blogs.map(blog => blog.toJSON());
+  return blogs.map<IBlogComplete>(blog => blog.toJSON());
 }
 
 export default { initialBlogs, blogsInDB };
