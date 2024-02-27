@@ -56,7 +56,7 @@ test('a valid blog can be added to the database', async () => {
   assert(titles.includes(newBlog.title));
 });
 
-test.only('"likes" property replaced with 0 if it was missing in request', async () => {
+test('"likes" property replaced with 0 if it was missing in request', async () => {
   const newBlog = {
     title: 'Title 4',
     author: 'Author4',
@@ -70,6 +70,32 @@ test.only('"likes" property replaced with 0 if it was missing in request', async
     .expect('Content-Type', /application\/json/);
 
   assert.strictEqual(response.body.likes, 0);
+});
+
+test.only('return 400 Bad Request if title is missing', async () => {
+  const newBlog = {
+    author: 'Author5',
+    url: 'https://address5.com',
+    likes: 55
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400);
+});
+
+test.only('return 400 Bad Request if url is missing', async () => {
+  const newBlog = {
+    title: 'Title 6',
+    author: 'Author6',
+    likes: 66
+  };
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400);
 });
 
 after(async () => {

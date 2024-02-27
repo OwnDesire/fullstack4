@@ -2,9 +2,15 @@ import mongoose from 'mongoose';
 import { IBlog } from '../types/blog';
 
 const blogSchema = new mongoose.Schema<IBlog>({
-  title: String,
+  title: {
+    type: String,
+    required: true
+  },
   author: String,
-  url: String,
+  url: {
+    type: String,
+    required: true
+  },
   likes: Number
 });
 
