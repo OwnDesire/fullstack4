@@ -8,7 +8,7 @@ import {initialBlogs, blogsInDB} from './test_helper';
 
 const api = supertest(app);
 
-describe('with inititaly saved blogs in database', () => {
+describe.only('with inititaly saved blogs in database', () => {
   beforeEach(async () => {
     await Blog.deleteMany({});
 
@@ -86,7 +86,8 @@ describe('with inititaly saved blogs in database', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .expect(400);
+        .expect(400)
+        .expect('Content-Type', /appliction\/json/);
     });
 
     test('return 400 Bad Request if url is missing', async () => {
@@ -99,7 +100,8 @@ describe('with inititaly saved blogs in database', () => {
       await api
         .post('/api/blogs')
         .send(newBlog)
-        .expect(400);
+        .expect(400)
+        .expect('Content-Type', /appliction\/json/);
     });
   });
 
@@ -121,7 +123,8 @@ describe('with inititaly saved blogs in database', () => {
     test('return 400 Bad Request if the id has invalid format', async () => {
       const invalidId = '123';
       await api.put(`/api/blogs/${invalidId}`)
-        .expect(400);
+        .expect(400)
+        .expect('Content-Type', /appliction\/json/);
     });
   });
 
@@ -142,7 +145,8 @@ describe('with inititaly saved blogs in database', () => {
     test('return 400 Bad Request if the id has invalid format', async () => {
       const invalidId = '123';
       await api.delete(`/api/blogs/${invalidId}`)
-        .expect(400);
+        .expect(400)
+        .expect('Content-Type', /appliction\/json/);
     });
   });
 

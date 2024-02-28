@@ -18,26 +18,127 @@ describe.only('with one initial user in db', () => {
     await user.save();
   });
 
-  test.only('successful creation of user with valid credentials', async () => {
-    const usersAtStart = await usersInDB();
+  describe.only('adding users', () => {
+    test('successful creation of user with valid credentials', async () => {
+      const usersAtStart = await usersInDB();
 
-    const newUser = {
-      username: 'owndesire',
-      name: 'Dan Dav',
-      password: 'erised'
-    };
+      const newUser = {
+        username: 'owndesire',
+        name: 'Dan Dav',
+        password: 'secret'
+      };
 
-    await api
-      .post('/api/users')
-      .send(newUser)
-      .expect(201)
-      .expect('Content-Type', /application\/json/);
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
 
-    const usersAtEnd = await usersInDB();
-    assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1);
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length + 1);
 
-    const userNames = usersAtEnd.map(user => user.username);
-    assert(userNames.includes(newUser.username));
+      const userNames = usersAtEnd.map(user => user.username);
+      assert(userNames.includes(newUser.username));
+    });
+
+    test.only('error with 400 Bad Request, when trying to create user with already existing userame', async () => {
+      const usersAtStart = await usersInDB();
+
+      const newUser = {
+        username: 'root',
+        name: 'SuperAdmin',
+        password: 'secret',
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+
+      assert(response.body.error.includes('"username" must be unique'));
+
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    });
+
+    test.only('error with 400 Bad Request, when username is missing', async () => {
+      const usersAtStart = await usersInDB();
+
+      const newUser = {
+        name: 'SuperAdmin',
+        password: 'secret'
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    });
+
+    test.only('error with 400 Bad Request, when password is missing', async () => {
+      const usersAtStart = await usersInDB();
+
+      const newUser = {
+        username: 'admin',
+        name: 'SuperAdmin'
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+
+      assert(response.body.error.includes('Password is missing'));
+
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    });
+
+    test.only('error with 400 Bad Request, when username is too short', async () => {
+      const usersAtStart = await usersInDB();
+
+      const newUser = {
+        username: 'wo',
+        name: 'SuperAdmin',
+        password: 'secret',
+      }
+
+      await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    });
+
+    test.only('error with 400 Bad Request, when password is too short', async () => {
+      const usersAtStart = await usersInDB();
+
+      const newUser = {
+        username: 'admin',
+        name: 'SuperAdmin',
+        password: 'ps',
+      }
+
+      const response = await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(400)
+        .expect('Content-Type', /application\/json/);
+
+      assert(response.body.error.includes('Password length should be at least 3 characters long'));
+
+      const usersAtEnd = await usersInDB();
+      assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    });
   });
 
   after(async () => {

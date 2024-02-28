@@ -14,8 +14,11 @@ const errorHandler = (error: Error, request: Request, response: Response, next: 
     case 'CastError':
       return response.status(400).send({ error: 'Malformed id.' });
     case 'ValidationError':
-    case 'InvalidNumber':
       return response.status(400).json({ error: error.message });
+    case 'MongoServerError':
+      if (error.message.includes('E11000 duplicate key error')) {
+        return response.status(400).json({ error: '"username" must be unique.' });
+      }
   }
 
   next(error);

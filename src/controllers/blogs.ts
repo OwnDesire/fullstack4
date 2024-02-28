@@ -24,12 +24,14 @@ blogRouter.post('/', async (request, response) => {
 
 blogRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body;
-  const blog: IBlog = {
-    title,
-    author,
-    url,
-    likes
-  };
+  // temp
+  // const blog: IBlog = {
+  //   title,
+  //   author,
+  //   url,
+  //   likes
+  // };
+  const blog = {}
 
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
