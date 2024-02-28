@@ -5,9 +5,16 @@ import { hash } from 'bcrypt';
 
 const userRouter = Router();
 
+userRouter.get('/', async (request, response) => {
+  const users = await User
+    .find({})
+    .populate('blogs', {title: 1, author: 1, url: 1, likes: 1});
+  response.json(users);
+});
+
 userRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body;
-  // Need to validate if  password defined in the controller,
+  // Need to validate if password defined in the controller,
   // because "hash" function does not accept undefined as first argument.
   if (!password) {
     response.status(400).json({

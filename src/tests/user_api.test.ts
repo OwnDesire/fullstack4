@@ -18,7 +18,7 @@ describe.only('with one initial user in db', () => {
     await user.save();
   });
 
-  describe.only('adding users', () => {
+  describe('adding users', () => {
     test('successful creation of user with valid credentials', async () => {
       const usersAtStart = await usersInDB();
 
@@ -41,7 +41,7 @@ describe.only('with one initial user in db', () => {
       assert(userNames.includes(newUser.username));
     });
 
-    test.only('error with 400 Bad Request, when trying to create user with already existing userame', async () => {
+    test('error with 400 Bad Request, when trying to create user with already existing userame', async () => {
       const usersAtStart = await usersInDB();
 
       const newUser = {
@@ -62,7 +62,7 @@ describe.only('with one initial user in db', () => {
       assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     });
 
-    test.only('error with 400 Bad Request, when username is missing', async () => {
+    test('error with 400 Bad Request, when username is missing', async () => {
       const usersAtStart = await usersInDB();
 
       const newUser = {
@@ -80,7 +80,7 @@ describe.only('with one initial user in db', () => {
       assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     });
 
-    test.only('error with 400 Bad Request, when password is missing', async () => {
+    test('error with 400 Bad Request, when password is missing', async () => {
       const usersAtStart = await usersInDB();
 
       const newUser = {
@@ -100,7 +100,7 @@ describe.only('with one initial user in db', () => {
       assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     });
 
-    test.only('error with 400 Bad Request, when username is too short', async () => {
+    test('error with 400 Bad Request, when username is too short', async () => {
       const usersAtStart = await usersInDB();
 
       const newUser = {
@@ -119,7 +119,7 @@ describe.only('with one initial user in db', () => {
       assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     });
 
-    test.only('error with 400 Bad Request, when password is too short', async () => {
+    test('error with 400 Bad Request, when password is too short', async () => {
       const usersAtStart = await usersInDB();
 
       const newUser = {
