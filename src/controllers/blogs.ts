@@ -1,6 +1,6 @@
-import { Router, response } from "express";
-import Blog from "../models/blog";
-import { IBlog } from "../types/blog";
+import { Router } from 'express';
+import Blog from '../models/blog';
+import { IBlog } from '../types/blog';
 
 const blogRouter = Router();
 
@@ -17,6 +17,7 @@ blogRouter.post('/', async (request, response) => {
     url,
     likes: likes || 0
   });
+
   const result = await blog.save();
   response.status(201).json(result);
 });

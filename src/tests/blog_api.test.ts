@@ -1,10 +1,10 @@
 import { test, after, beforeEach, describe } from 'node:test';
 import assert from 'node:assert';
 import supertest from 'supertest';
-import mongoose from 'mongoose';
+import { connection } from 'mongoose';
 import app from '../app';
 import Blog from '../models/blog';
-import helper from './blog_test_helper';
+import {initialBlogs, blogsInDB} from './test_helper';
 
 const api = supertest(app);
 
@@ -12,7 +12,7 @@ describe('with inititaly saved blogs in database', () => {
   beforeEach(async () => {
     await Blog.deleteMany({});
 
-    for (const blog of helper.initialBlogs) {
+    for (const blog of initialBlogs) {
       const newBlog = new Blog(blog);
       await newBlog.save();
     }
@@ -28,7 +28,7 @@ describe('with inititaly saved blogs in database', () => {
 
     test('there is a correct number of blogs', async () => {
       const response = await api.get('/api/blogs');
-      assert.strictEqual(response.body.length, helper.initialBlogs.length);
+      assert.strictEqual(response.body.length, initialBlogs.length);
     });
 
     test('blogs have the property named "id" as a unique identifier', async () => {
@@ -53,8 +53,8 @@ describe('with inititaly saved blogs in database', () => {
         .expect(201)
         .expect('Content-Type', /application\/json/);
 
-      const blogsAtEnd = await helper.blogsInDB();
-      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+      const blogsAtEnd = await blogsInDB();
+      assert.strictEqual(blogsAtEnd.length, initialBlogs.length + 1);
 
       const titles = blogsAtEnd.map(blog => blog.title);
       assert(titles.includes(newBlog.title));
@@ -105,7 +105,7 @@ describe('with inititaly saved blogs in database', () => {
 
   describe('updating blogs', () => {
     test('blog likes updated by valid id with OK response', async () => {
-      const blogsAtStart = await helper.blogsInDB();
+      const blogsAtStart = await blogsInDB();
       const blogToUpdate = blogsAtStart[0];
       const updatedData = { ...blogToUpdate, likes: 111 };
       await api.put(`/api/blogs/${blogToUpdate.id}`)
@@ -113,7 +113,7 @@ describe('with inititaly saved blogs in database', () => {
         .expect(200)
         .expect('Content-Type', /application\/json/);
 
-      const blogsAtEnd = await helper.blogsInDB();
+      const blogsAtEnd = await blogsInDB();
       const updatedBlog = blogsAtEnd[0];
       assert.strictEqual(updatedData.likes, updatedBlog.likes);
     });
@@ -127,12 +127,12 @@ describe('with inititaly saved blogs in database', () => {
 
   describe('deleting blogs', () => {
     test('blog deleted by valid id with response status code 204', async () => {
-      const blogsAtStart = await helper.blogsInDB();
+      const blogsAtStart = await blogsInDB();
       const blogToDelete = blogsAtStart[0];
       await api.delete(`/api/blogs/${blogToDelete.id}`)
         .expect(204);
 
-      const blogsAtEnd = await helper.blogsInDB();
+      const blogsAtEnd = await blogsInDB();
       assert.strictEqual(blogsAtEnd.length, blogsAtStart.length - 1);
 
       const titles = blogsAtEnd.map(blog => blog.title);
@@ -147,6 +147,6 @@ describe('with inititaly saved blogs in database', () => {
   });
 
   after(async () => {
-    await mongoose.connection.close();
+    await connection.close();
   });
 });

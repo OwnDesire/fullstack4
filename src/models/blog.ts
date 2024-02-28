@@ -1,7 +1,7 @@
-import mongoose from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 import { IBlog } from '../types/blog';
 
-const blogSchema = new mongoose.Schema<IBlog>({
+const blogSchema = new Schema<IBlog>({
   title: {
     type: String,
     required: true
@@ -11,7 +11,11 @@ const blogSchema = new mongoose.Schema<IBlog>({
     type: String,
     required: true
   },
-  likes: Number
+  likes: Number,
+  user: {
+    type: Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 blogSchema.set('toJSON', {
@@ -22,4 +26,4 @@ blogSchema.set('toJSON', {
   }
 });
 
-export default mongoose.model<IBlog>('Blog', blogSchema);
+export default model<IBlog>('Blog', blogSchema);

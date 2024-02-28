@@ -1,6 +1,6 @@
-import { IBlogComplete } from "../types/blog";
+import { IBlogComplete } from '../types/blog';
 import _ from 'lodash';
-import logger from "./logger";
+import logger from './logger';
 
 const dummy = (blogs: IBlogComplete[]): number => {
   return 1;
