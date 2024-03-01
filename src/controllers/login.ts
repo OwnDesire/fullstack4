@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { sign } from 'jsonwebtoken';
 import { compare } from 'bcrypt';
 import User from '../models/user';
+import { IJWTUserData } from '../types/login';
 
 const loginRouter = Router();
 
@@ -16,7 +17,7 @@ loginRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'Invalid username or password.' });
   }
 
-  const dataForToken = {
+  const dataForToken: IJWTUserData = {
     username: user.username,
     id: user._id
   };

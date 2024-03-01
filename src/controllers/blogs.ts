@@ -1,7 +1,19 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
+import { verify } from 'jsonwebtoken';
 import Blog from '../models/blog';
 import { IBlog } from '../types/blog';
 import User from '../models/user';
+import { IJWTUserData } from '../types/login';
+import { CustomExpressError } from '../types/error';
+
+const getTokenHelper = (request: Request) : string | null => {
+  const authorization = request.get('authorization');
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '');
+  }
+
+  return null;
+};
 
 const blogRouter = Router();
 
@@ -12,23 +24,38 @@ blogRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-blogRouter.post('/', async (request, response) => {
-  // TODO: Reuqire refactoring (especially user usage).
+blogRouter.post('/', async (request, response, next) => {
+  // TODO: Revise logic about checking token (considering that we have proper middleware),
+  // and about user non-null ascertion.
   const { title, author, url, likes } = request.body;
-  const user = await User.findOne({ username: 'root' });
-  const blog = new Blog({
-    title,
-    author,
-    url,
-    likes: likes || 0,
-    user: user?.id
-  });
+  try {
+    const token = getTokenHelper(request);
+    if (!token) {
+      throw new CustomExpressError(401, 'Token is missing.');
+    }
+  
+    const decodedToken = verify(token!, process.env.SECRET!) as IJWTUserData;
+    if (!decodedToken.id) {
+      throw new CustomExpressError(401, 'Invalid token.');
+    }
 
-  const savedBlog = await blog.save();
-  user!.blogs = user!.blogs.concat(savedBlog._id);
-  await user?.save();
-
-  response.status(201).json(savedBlog);
+    const user = await User.findById(decodedToken.id);
+    const blog = new Blog({
+      title,
+      author,
+      url,
+      likes: likes || 0,
+      user: user!._id
+    });
+  
+    const savedBlog = await blog.save();
+    user!.blogs = user!.blogs.concat(savedBlog._id);
+    await user?.save();
+  
+    response.status(201).json(savedBlog);
+  } catch (error) {
+    next(error);
+  }
 });
 
 blogRouter.put('/:id', async (request, response) => {
