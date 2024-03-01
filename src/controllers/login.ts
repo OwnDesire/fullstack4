@@ -22,9 +22,12 @@ loginRouter.post('/', async (request, response) => {
     id: user._id
   };
   // Secret type does not allowed to be undefined.
-  const token = sign(dataForToken, process.env.SECRET!);
+  const token = sign(
+    dataForToken,
+    process.env.SECRET!,
+    { expiresIn: 10 * 60 }
+  );
   response.status(200).send({ token, username: user.username, name: user.name });
 });
 
 export default loginRouter;
-

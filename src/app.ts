@@ -9,7 +9,6 @@ import loginRouter from './controllers/login';
 import middleware from './utils/middleware';
 import logger from './utils/logger';
 
-
 const app = express();
 
 mongoose.set('strictQuery', false);
