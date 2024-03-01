@@ -13,21 +13,17 @@ userRouter.get('/', async (request, response) => {
   response.json(users);
 });
 
-userRouter.post('/', async (request, response, next) => {
+userRouter.post('/', async (request, response) => {
   const { username, name, password } = request.body;
-  try {
-    // Need to validate if password defined in the controller,
-    // because "hash" function does not accept undefined as first argument.
-    if (!password) {
-      throw new CustomValidationError('Password is missing.');
-    }
-    // Need to verify password length in the controller,
-    // because mongoose may only validate passwordHash.
-    if (password.length < 3) {
-      throw new CustomValidationError('Password length should be at least 3 characters long.');
-    }
-  } catch (error) {
-    next(error);
+  // Need to validate if password defined in the controller,
+  // because "hash" function does not accept undefined as first argument.
+  if (!password) {
+    throw new CustomValidationError('Password is missing.');
+  }
+  // Need to verify password length in the controller,
+  // because mongoose may only validate passwordHash.
+  if (password.length < 3) {
+    throw new CustomValidationError('Password length should be at least 3 characters long.');
   }
 
   const SALTROUNDS = 10;

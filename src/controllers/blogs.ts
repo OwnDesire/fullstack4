@@ -1,19 +1,10 @@
-import { Router, Request } from 'express';
+import { Router } from 'express';
 import { verify } from 'jsonwebtoken';
 import Blog from '../models/blog';
 import { IBlog } from '../types/blog';
 import User from '../models/user';
 import { IJWTUserData } from '../types/login';
-import { CustomExpressError } from '../types/error';
-
-const getTokenHelper = (request: Request) : string | null => {
-  const authorization = request.get('authorization');
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '');
-  }
-
-  return null;
-};
+import { CustomExpressError, DBNotFoundError } from '../types/error';
 
 const blogRouter = Router();
 
@@ -24,38 +15,37 @@ blogRouter.get('/', async (request, response) => {
   response.json(blogs);
 });
 
-blogRouter.post('/', async (request, response, next) => {
+blogRouter.post('/', async (request, response) => {
   // TODO: Revise logic about checking token (considering that we have proper middleware),
   // and about user non-null ascertion.
-  const { title, author, url, likes } = request.body;
-  try {
-    const token = getTokenHelper(request);
-    if (!token) {
-      throw new CustomExpressError(401, 'Token is missing.');
-    }
-  
-    const decodedToken = verify(token!, process.env.SECRET!) as IJWTUserData;
-    if (!decodedToken.id) {
-      throw new CustomExpressError(401, 'Invalid token.');
-    }
-
-    const user = await User.findById(decodedToken.id);
-    const blog = new Blog({
-      title,
-      author,
-      url,
-      likes: likes || 0,
-      user: user!._id
-    });
-  
-    const savedBlog = await blog.save();
-    user!.blogs = user!.blogs.concat(savedBlog._id);
-    await user?.save();
-  
-    response.status(201).json(savedBlog);
-  } catch (error) {
-    next(error);
+  const { title, author, url, likes, token } = request.body;
+  if (!token) {
+    throw new CustomExpressError(401, 'Token is missing.');
   }
+
+  const decodedToken = verify(token, process.env.SECRET!) as IJWTUserData;
+  if (!decodedToken.id) {
+    throw new CustomExpressError(401, 'Invalid token.');
+  }
+
+  const user = await User.findById(decodedToken.id);
+  if (!user) {
+    throw new DBNotFoundError('User was not found.');
+  }
+
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    likes: likes || 0,
+    user: user._id
+  });
+
+  const savedBlog = await blog.save();
+  user.blogs = user.blogs.concat(savedBlog._id);
+  await user.save();
+
+  response.status(201).json(savedBlog);
 });
 
 blogRouter.put('/:id', async (request, response) => {

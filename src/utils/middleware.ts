@@ -2,6 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import { CustomExpressError } from '../types/error';
 import logger from './logger';
 
+const tokenHandler = (request: Request, response: Response, next: NextFunction): void => {
+  const authorization = request.get('authorization');
+  if (authorization && authorization.startsWith('Bearer ')) {
+    request.body.token = authorization.replace('Bearer ', '');
+  }
+
+  next();
+};
+
 const unknownEndpoint = (request: Request, response: Response): void => {
   const message = 'Unknown endpoint.';
   logger.error(message);
@@ -21,6 +30,8 @@ const errorHandler = (error: Error, request: Request, response: Response, next: 
         return response.status(400).json({ error: '"username" must be unique.' });
       }
       break;
+    case 'DBNotFoundError': 
+      return response.status(404).json({ error: error.message });
     case 'JsonWebTokenError':
       return response.status(400).json({ error: 'Token is missing or invalid.'});
     case 'CustomExpressError': 
@@ -30,4 +41,4 @@ const errorHandler = (error: Error, request: Request, response: Response, next: 
   next(error);
 }
 
-export default { unknownEndpoint, errorHandler };
+export default { tokenHandler, unknownEndpoint, errorHandler };

@@ -12,4 +12,11 @@ class CustomValidationError extends Error {
   }
 }
 
-export { CustomExpressError, CustomValidationError };
+class DBNotFoundError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DBNotFoundError';
+  }
+}
+
+export { CustomExpressError, CustomValidationError, DBNotFoundError };
