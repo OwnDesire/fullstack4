@@ -5,6 +5,19 @@ import { IBlog } from '../types/blog';
 import User from '../models/user';
 import { IJWTUserData } from '../types/login';
 import { CustomExpressError, DBNotFoundError } from '../types/error';
+// TODO: Revise if it should be moved to another file and if logic shoud be separated.
+const tokenDecoder = (token: string): IJWTUserData => {
+  if (!token) {
+    throw new CustomExpressError(401, 'Token is missing.');
+  }
+
+  const decodedToken = verify(token, process.env.SECRET!) as IJWTUserData;
+  if (!decodedToken.id) {
+    throw new CustomExpressError(401, 'Invalid token.');
+  }
+
+  return decodedToken;
+};
 
 const blogRouter = Router();
 
@@ -16,18 +29,8 @@ blogRouter.get('/', async (request, response) => {
 });
 
 blogRouter.post('/', async (request, response) => {
-  // TODO: Revise logic about checking token (considering that we have proper middleware),
-  // and about user non-null ascertion.
   const { title, author, url, likes, token } = request.body;
-  if (!token) {
-    throw new CustomExpressError(401, 'Token is missing.');
-  }
-
-  const decodedToken = verify(token, process.env.SECRET!) as IJWTUserData;
-  if (!decodedToken.id) {
-    throw new CustomExpressError(401, 'Invalid token.');
-  }
-
+  const decodedToken = tokenDecoder(token);
   const user = await User.findById(decodedToken.id);
   if (!user) {
     throw new DBNotFoundError('User was not found.');
@@ -69,7 +72,18 @@ blogRouter.put('/:id', async (request, response) => {
 });
 
 blogRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id);
+  const { token } = request.body;
+  const decodedToken = tokenDecoder(token);
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    throw new DBNotFoundError('Blog was not found.');
+  }
+
+  if (blog.user.toString() !== decodedToken.id.toString()) {
+    throw new CustomExpressError(403, 'Insufficient permissions.');
+  }
+
+  await blog.deleteOne();
   response.status(204).end();
 });
 
