@@ -3,33 +3,20 @@ import { IBlog, IBlogComplete } from '../types/blog';
 import User from '../models/user';
 import { IUserComplete } from '../types/user';
 
-// Commented variant with expicit type definition for current state.
-// const initialBlogs: IBlog[] = [
-//   {
-//     title: 'Title 1',
-//     author: 'Author1',
-//     url: 'https://address1.com',
-//     likes: 11,
-//   },
-//   {
-//     title: 'Title 2',
-//     author: 'Author2',
-//     url: 'https://address2.com',
-//     likes: 22
-//   }
-// ];
-const initialBlogs = [
+const initialBlogs: IBlog[] = [
   {
     title: 'Title 1',
     author: 'Author1',
     url: 'https://address1.com',
     likes: 11,
+    user: {}
   },
   {
     title: 'Title 2',
     author: 'Author2',
     url: 'https://address2.com',
-    likes: 22
+    likes: 22,
+    user: {}
   }
 ];
 
@@ -44,7 +31,7 @@ const usersInDB = async () => {
 };
 
 export {
-  initialBlogs, 
+  initialBlogs,
   blogsInDB,
   usersInDB
 };

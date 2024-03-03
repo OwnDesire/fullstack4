@@ -9,7 +9,7 @@ import { hash } from 'bcrypt';
 
 const api = supertest(app);
 
-describe.only('with one initial user in db', () => {
+describe('with one initial user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
