@@ -27,25 +27,24 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id);
   await user.save();
 
-  response.status(201).json(savedBlog);
+  response.status(201).json(await savedBlog.populate('user', { username: 1, name: 1 }));
 });
 
-blogRouter.put('/:id', async (request, response) => {
-  const { title, author, url, likes } = request.body;
-  // TODO: needs rework concerning user.
+blogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
+  const { title, author, url, likes, user } = request.body;
   const blog: IBlog = {
     title,
     author,
     url,
     likes,
-    user: {}
+    user
   };
 
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
     blog,
     { new: true, runValidators: true, context: 'query' }
-  )
+  ).populate('user', { username: 1, name: 1 });
 
   response.json(updatedBlog);
 });
