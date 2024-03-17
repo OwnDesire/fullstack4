@@ -8,7 +8,8 @@
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
     "test-blog": "cross-env NODE_ENV=test tsx --test src/tests/blog_api.test.ts",
     "test-user": "cross-env NODE_ENV=test tsx --test src/tests/user_api.test.ts",
-    "test-only": "cross-env NODE_ENV=test tsx --test --test-only src/tests/*.test.ts"
+    "test-only": "cross-env NODE_ENV=test tsx --test --test-only src/tests/*.test.ts",
+    "start:test": "cross-env NODE_ENV=test ts-node src/index.ts"
   },
   "repository": {
     "type": "git",
