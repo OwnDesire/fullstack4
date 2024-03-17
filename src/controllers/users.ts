@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import User from '../models/user';
-import { IUser } from '../types/user';
 import { hash } from 'bcrypt';
 import { CustomValidationError } from '../types/error';
 
