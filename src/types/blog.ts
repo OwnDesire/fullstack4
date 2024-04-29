@@ -5,7 +5,8 @@ interface IBlog {
   author: string,
   url: string,
   likes: number,
-  user: Types.ObjectId | Record<string, unknown>
+  user: Types.ObjectId | Record<string, unknown>,
+  comments: string[]
 }
 
 interface IBlogComplete extends IBlog {

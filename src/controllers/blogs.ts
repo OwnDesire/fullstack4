@@ -30,14 +30,26 @@ blogRouter.post('/', middleware.userExtractor, async (request, response) => {
   response.status(201).json(await savedBlog.populate('user', { username: 1, name: 1 }));
 });
 
+blogRouter.post('/:id/comments', middleware.userExtractor, async (request, response) => {
+  const { comment } = request.body;
+  const commentedBlog = await Blog.findByIdAndUpdate(
+    request.params.id,
+    { $push: { comments: comment } },
+    { new: true, runValidators: true, contex: 'query'}
+  ).populate('user', { username: 1, name: 1 });
+
+  response.json(commentedBlog);
+});
+
 blogRouter.put('/:id', middleware.userExtractor, async (request, response) => {
-  const { title, author, url, likes, user } = request.body;
+  const { title, author, url, likes, user, comments } = request.body;
   const blog: IBlog = {
     title,
     author,
     url,
     likes,
-    user
+    user,
+    comments
   };
 
   const updatedBlog = await Blog.findByIdAndUpdate(
